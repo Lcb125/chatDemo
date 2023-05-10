@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping("user")
-public class CHatDemoController {
+public class ChatDemoController {
 
     @Resource
     private ISysuserService us;
