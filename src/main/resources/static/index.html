@@ -269,14 +269,14 @@
       };
     },
     created: function () {
-      document.addEventListener("keydown", (e) => {
-        let key = window.event.keyCode;
-        if (!this.loading) {
-          // 13是enter键的键盘码 如果等于13 就调用click的登录方法
-          // key == 13 &&
-          this.handleMsg();
-        }
-      });
+      // document.addEventListener("keydown", (e) => {
+      //   let key = window.event.keyCode;
+      //   if (!this.loading) {
+      //     // 13是enter键的键盘码 如果等于13 就调用click的登录方法
+      //     // key == 13 &&
+      //     this.handleMsg();
+      //   }
+      // });
     },
     methods: {
       async handleMsg() {
