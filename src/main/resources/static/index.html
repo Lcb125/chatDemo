@@ -118,7 +118,7 @@
 
     <el-header class="header">
       <div class="title">
-        ChatGPT聊天窗口
+        ChatGPT Stream
       </div>
 
     </el-header>
@@ -167,7 +167,7 @@
     </el-main>
     <el-footer class="footer">
       <el-input
-              placeholder="请输入内容"
+              placeholder="Your question"
               v-model="input3"
               class="input-with-select"
               :autofocus="true"
@@ -179,7 +179,7 @@
                 slot="append"
                 type="primary"
                 @click="handleMsg"
-        >发送</el-button
+        >Send</el-button
         >
       </el-input>
     </el-footer>
@@ -271,8 +271,9 @@
     created: function () {
       document.addEventListener("keydown", (e) => {
         let key = window.event.keyCode;
-        if (key == 13 && !this.loading) {
+        if (!this.loading) {
           // 13是enter键的键盘码 如果等于13 就调用click的登录方法
+          // key == 13 &&
           this.handleMsg();
         }
       });

@@ -2,36 +2,15 @@ package com.java.common;
 
 import cn.hutool.core.convert.ConvertException;
 import cn.hutool.http.*;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.java.sys.entity.ChatGPTProperties;
-import com.java.sys.entity.GPTResponse;
-import com.theokanning.openai.OpenAiService;
-import com.theokanning.openai.completion.CompletionChoice;
-import com.theokanning.openai.completion.CompletionRequest;
-import com.unfbx.chatgpt.OpenAiClient;
-import com.unfbx.chatgpt.entity.completions.CompletionResponse;
-import com.unfbx.chatgpt.interceptor.OpenAILogger;
-import okhttp3.*;
-import okhttp3.logging.HttpLoggingInterceptor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 
 //import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class ChatUtil {
