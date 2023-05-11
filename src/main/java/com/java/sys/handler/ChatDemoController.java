@@ -63,7 +63,7 @@ public class ChatDemoController {
     @PostMapping(value = "/testChat")
     @ResponseBody
     public ResponseEntity testChat(@RequestBody ChatGPTReq req)  {
-        if (StringUtils.isEmpty(req.getCode()) || !"123456".equals(req.getCode())){
+        if (StringUtils.isEmpty(req.getCode()) || !"135790".equals(req.getCode())){
             return ResponseEntity.status(500).body("401");
         }
         String s = "";

@@ -1,222 +1,355 @@
-
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <!-- import CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
-    />
-  </head>
-  <style type="text/css">
-    .msgCss {
-      font-size: 16px;
-      font-weight: 500;
-    }
-  </style>
-
-  <body>
-    <div id="app">
-      <el-button @click="visible11" type="primary">打开聊天框</el-button>
-      <el-dialog :visible.sync="visible" title="对话框">
-        <div style="height: 500px; overflow-y: auto" id="bigBox">
-          <div
-            v-for="(item, index) in list"
-            class="msgCss"
-            :style="{textAlign: item.align}"
-          >
-            <span v-if="item && item.align == 'left'">
-              <img
-                style="
-                  width: 50px;
-                  height: 50px;
-                  vertical-align: middle;
-                  border-radius: 50%;
-                  padding-right: 10px;
-                "
-                src="./img/dianxiaoer.jpg"
-                alt=""
-              />
-              <span v-if="item && item.link == ''">{{item.text}}</span>
-              <span v-if="item && item.link"
-                >: <a :href="item.link" target="_blank">{{item.text}}</a></span
-              >
-            </span>
-            <span v-if="item && item.align == 'right'">
-              {{item.text}}<img
-                style="
-                  width: 50px;
-                  height: 50px;
-                  vertical-align: middle;
-                  border-radius: 50%;
-                  padding-right: 10px;
-                  padding-left: 10px;
-                "
-                src="./img/OIP.jpg"
-                alt=""
-              />
-            </span>
-          </div>
-        </div>
-        <div style="margin-top: 15px">
-          <el-input
-            placeholder="请输入内容"
-            v-model="input3"
-            class="input-with-select"
-            :autofocus="true"
-            ref="serachBox"
-          >
-            <el-button
-              :loading="loading"
-              @keydown.enter.native="handleMsg"
-              slot="append"
-              type="primary"
-              @click="handleMsg"
-              >发送</el-button
-            >
-          </el-input>
-        </div>
-      </el-dialog>
-    </div>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <!-- <meta name="viewport" content="width=device-width,initial-scale=1.0"> -->
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+  <!-- 启用360浏览器的极速模式(webkit) -->
+  <meta name="renderer" content="webkit">
+  <!-- 避免IE使用兼容模式 -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- 针对手持设备优化，主要是针对一些老的不识别viewport的浏览器，比如黑莓 -->
+  <meta name="HandheldFriendly" content="true">
+  <!-- 微软的老式浏览器 -->
+  <meta name="MobileOptimized" content="320">
+  <!-- uc强制竖屏 -->
+  <meta name="screen-orientation" content="portrait">
+  <!-- QQ强制竖屏 -->
+  <meta name="x5-orientation" content="portrait">
+  <!-- UC强制全屏 -->
+  <meta name="full-screen" content="yes">
+  <!-- QQ强制全屏 -->
+  <meta name="x5-fullscreen" content="true">
+  <!-- UC应用模式 -->
+  <meta name="browsermode" content="application">
+  <!-- QQ应用模式 -->
+  <meta name="x5-page-mode" content="app">
+  <!-- windows phone 点击无高光 -->
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta content="telephone=no" name="format-detection" />
+  <meta name="huaban" content="nopin" />
+  <link rel="icon" type="image/x-icon" href="./img/logo.jpg" rel="external nofollow" >
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <title>chatDemo</title>
+  <!-- <script src="C:\code\web\vue.js"></script> -->
+  <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-router@3.1.5/dist/vue-router.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vuex@3.1.2/dist/vuex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios@0.19.2/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/echarts@4.6.0/dist/echarts.simple.min.js"></script>
-  <script>
-    if (typeof Vue == "undefined") {
-      document.write(
-        unescape(
-          "%3Cscript src='vendor/vue.min.js' type='text/javascript'%3E%3C/script%3E"
-        )
-      );
-    }
-    if (typeof VueRouter == "undefined") {
-      document.write(
-        unescape(
-          "%3Cscript src='vendor/vue-router.min.js' type='text/javascript'%3E%3C/script%3E"
-        )
-      );
-    }
-    if (typeof Vuex == "undefined") {
-      document.write(
-        unescape(
-          "%3Cscript src='vendor/vuex.min.js' type='text/javascript'%3E%3C/script%3E"
-        )
-      );
-    }
-    if (typeof axios == "undefined") {
-      document.write(
-        unescape(
-          "%3Cscript src='vendor/axios.min.js' type='text/javascript'%3E%3C/script%3E"
-        )
-      );
-    }
-  </script>
-  <!-- import JavaScript -->
-  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-  <script>
-    // import {Message} from "element-ui";
-    new Vue({
-      el: "#app",
-      data: function () {
-        return {
-          visible: false,
-          input3: "",
-          list: [],
-          loading: false,
-        };
+</head>
+<style type="text/css">
+
+
+
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  html,body {
+    width: 100%;
+    height: 100%;
+    /* margin-bottom: 10%; */
+  }
+
+  .all {
+    width: 100%;
+    height: 100%;
+  }
+
+  .el-header, .el-footer {
+    background-color: #4a85d3;
+    color: #333;
+    text-align: center;
+    padding: 0px 0px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* line-height: 375%; */
+  }
+
+  .el-main {
+    background-color: #E9EEF3;
+    color: #333;
+    text-align: center;
+    /* line-height: 100%; */
+  }
+
+  /* .header { */
+  /* position: fixed;
+  width: 100%;
+  height: 7%;
+  text-align: center;
+  background: rgb(80, 176, 185); */
+  /* overflow: auto; */
+  /* position: absolute; */
+  /* } */
+
+
+
+  .input-with-select {
+    /* width: 70%; */
+    height: 100%;
+    line-height: 100%;
+  }
+  .el-input__inner {
+    height: 100%;
+    line-height: 80%;
+    font-size: medium;
+    /* text-align: center; */
+  }
+
+
+
+  .msgCss {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+</style>
+<body>
+<div id="app" class="all">
+
+  <el-container>
+
+    <el-header class="header">
+      <div class="title">
+        ChatGPT聊天窗口
+      </div>
+
+    </el-header>
+    <el-main class="main">
+
+      <div style="overflow-y: auto" id="bigBox">
+        <div
+                v-for="(item, index) in list"
+                class="msgCss"
+                :style="{textAlign: item.align}"
+        >
+          <span class="left" v-if="item && item.align == 'left'">
+            <img
+                    style="
+                width: 50px;
+                height: 50px;
+                vertical-align: middle;
+                border-radius: 50%;
+                padding-right: 10px;
+              "
+                    src="./img/dianxiaoer.jpg"
+                    alt=""
+            />
+            <span v-if="item && item.link == ''">{{item.text}}</span>
+            <span v-if="item && item.link"
+            >: <a :href="item.link" target="_blank">{{item.text}}</a></span
+            >
+          </span>
+          <span class="right" v-if="item && item.align == 'right'">
+            {{item.text}}<img
+                  style="
+                width: 50px;
+                height: 50px;
+                vertical-align: middle;
+                border-radius: 50%;
+                padding-right: 10px;
+                padding-left: 10px;
+              "
+                  src="./img/OIP.jpg"
+                  alt=""
+          />
+          </span>
+        </div>
+      </div>
+
+    </el-main>
+    <el-footer class="footer">
+      <el-input
+              placeholder="请输入内容"
+              v-model="input3"
+              class="input-with-select"
+              :autofocus="true"
+              ref="serachBox"
+      >
+        <el-button
+                :loading="loading"
+                @keydown.enter.native="handleMsg"
+                slot="append"
+                type="primary"
+                @click="handleMsg"
+        >发送</el-button
+        >
+      </el-input>
+    </el-footer>
+
+  </el-container>
+
+
+
+</div>
+<script>
+  //得到手机屏幕的宽度
+  let htmlWidth = document.documentElement.clientWidth || document.body.clientWidth;
+  //  console.log('htmlWidth',htmlWidth)
+  //得到手机屏幕的长度
+  let htmlHeight = document.documentElement.clientHeight || document.body.clientHeight;
+  //  console.log('htmlHeight',htmlHeight)
+  //得到html的Dom元素
+  let htmlDom = document.getElementsByTagName('html')[0];
+  if(htmlWidth>640){//超过640大小的，字体根部都是16px
+    htmlWidth=640;
+//  console.log('htmlWidth-true',htmlWidth)
+  }
+  //设置根元素字体大小
+  htmlDom.style.fontSize = htmlWidth / 40 + 'px';
+
+  //  let topDom = document.getElementsByClassName("top")[0];
+  //  topDom.style.fontSize = htmlWidth / 10 + 'px';
+
+  let mainDom = document.getElementsByClassName("main")[0];
+  mainDom.style.height = htmlHeight * 0.82 + 'px';
+  //  console.log(mainDom.style.height)
+  let headerDom = document.getElementsByClassName("header")[0];
+  headerDom.style.height = htmlHeight * 0.1 + 'px';
+  headerDom.style.fontSize = htmlWidth / 15 + 'px';
+  let footerDom = document.getElementsByClassName("footer")[0];
+  footerDom.style.height = htmlHeight * 0.08 + 'px';
+
+  //  let inputDom = document.getElementsByClassName("input-with-select")[0];
+  //  inputDom.style.height = htmlHeight * 0.08 + 'px';
+  //  inputDom.style.width = htmlWidth * 0.95 + 'px';
+  //  inputDom.style.fontSize = htmlWidth / 18 + 'px';
+
+</script>
+</body>
+
+<script>
+  if (typeof Vue == "undefined") {
+    document.write(
+            unescape(
+                    "%3Cscript src='vendor/vue.min.js' type='text/javascript'%3E%3C/script%3E"
+            )
+    );
+  }
+  if (typeof VueRouter == "undefined") {
+    document.write(
+            unescape(
+                    "%3Cscript src='vendor/vue-router.min.js' type='text/javascript'%3E%3C/script%3E"
+            )
+    );
+  }
+  if (typeof Vuex == "undefined") {
+    document.write(
+            unescape(
+                    "%3Cscript src='vendor/vuex.min.js' type='text/javascript'%3E%3C/script%3E"
+            )
+    );
+  }
+  if (typeof axios == "undefined") {
+    document.write(
+            unescape(
+                    "%3Cscript src='vendor/axios.min.js' type='text/javascript'%3E%3C/script%3E"
+            )
+    );
+  }
+</script>
+<!-- import JavaScript -->
+<script>
+  // import {Message} from "element-ui";
+  new Vue({
+    el: "#app",
+    data: function () {
+      return {
+        // visible: false,
+        input3: "",
+        list: [],
+        loading: false,
+      };
+    },
+    created: function () {
+      document.addEventListener("keydown", (e) => {
+        let key = window.event.keyCode;
+        if (key == 13 && !this.loading) {
+          // 13是enter键的键盘码 如果等于13 就调用click的登录方法
+          this.handleMsg();
+        }
+      });
+    },
+    methods: {
+      async handleMsg() {
+        // console.log(this.input3, "发送信息");
+        if (this.input3 !== "") {
+          this.loading = true;
+          await this.list.push({ align: "right", text: this.input3 });
+          this.scrollTop11();
+          this.getMsg();
+          this.input3 = "";
+          // console.log(this.input3)
+
+        }
       },
-      created: function () {
-        document.addEventListener("keydown", (e) => {
-          let key = window.event.keyCode;
-          if (key == 13 && !this.loading) {
-            // 13是enter键的键盘码 如果等于13 就调用click的登录方法
-            this.handleMsg();
-          }
+      getMsg() {
+        // 处理接口请求 返回需要的数据
+        axios
+                .post("http://localhost:8080/user/testChat", { content: this.input3,code: '135790' })
+                .then(async (response) => {
+                  // console.log(response);
+                  if (response.status == 200) {
+
+                    // 自行处理需要的数据
+
+                    const msg = response.data;
+                    let listMsg = {
+                      align: "left",
+                      text: msg,
+                      link: "",
+                    };
+                    // if (msg.flag == 1) {
+                    //   const splitMsg = msg.answer.split("：");
+                    //   listMsg.text = splitMsg[0];
+                    //   listMsg.link = splitMsg[1];
+                    // }
+                    await this.list.push(listMsg);
+                    this.scrollTop11();
+                  }else{
+
+                    Vue.prototype.$message({
+                      message: '获取结果超时',
+                      type: 'error'
+                    });
+
+                  }
+                  this.loading = false;
+                })
+                .catch(function (error) {
+                  console.log(error);
+                  Vue.prototype.$message({
+                    message: '获取结果超时',
+                    type: 'error'
+                  });
+                  this.loading = false;
+                });
+
+        this.loading = false;
+      },
+      // 处理滚动条一直保持最下方
+      scrollTop11() {
+        setTimeout(()=>{
+          console.log(`已把滚动条保持最下方`)
+          const infoBox = document.getElementsByClassName("main");
+          infoBox[0].scrollTop = infoBox[0].scrollHeight;
+        },0)
+      },
+      failAlert() {
+        console.log(11111111111111111)
+        this.$message({
+          message: '获取结果超时',
+          type: 'error'
         });
       },
-      methods: {
-        visible11() {
-          this.visible = true;
-          this.$nextTick(() => {
-            this.$refs.serachBox.focus();
-          });
-        },
-        async handleMsg() {
-          console.log(this.input3, "发送信息");
-          if (this.input3 !== "") {
-            this.loading = true;
-            await this.list.push({ align: "right", text: this.input3 });
-            await this.scrollTop11();
-            this.getMsg();
-            this.input3 = "";
-            // console.log(this.input3)
-            
-          }
-        },
-        getMsg() {
-          // 处理自己的接口请求 返回需要的数据
-          axios
-            .post("http://localhost:8080/user/testChat", { content: this.input3,code: '123456' })
-            .then(async (response) => {
-              console.log(response);
-              if (response.status == 200) {
-
-                // 自行处理需要的数据
-
-                const msg = response.data;
-                let listMsg = {
-                  align: "left",
-                  text: msg,
-                  link: "",
-                };
-                // if (msg.flag == 1) {
-                //   const splitMsg = msg.answer.split("：");
-                //   listMsg.text = splitMsg[0];
-                //   listMsg.link = splitMsg[1];
-                // }
-                await this.list.push(listMsg);
-                await this.scrollTop11();
-              }else{
-                
-                this.open4
-                
-              }
-              this.loading = false;
-            })
-            .catch(function (error) {
-              console.log(error);
-              this.loading = false;
-            });
-
-            this.loading = false;
-          /*
-           * 模拟信息返回
-           */
-        //   setTimeout(async () => {
-        //     let listMsg = {
-        //       align: "left",
-        //       text: "模拟信息返回",
-        //       link: "",
-        //     };
-        //     await this.list.push(listMsg);
-        //     await this.scrollTop11();
-        //     this.loading = false;
-        //   }, 1000);
-        },
-        open4() {
-        this.$message.error('获取结果超时');
-      },
-        // 处理滚动条一直保持最上方
-        scrollTop11() {
-          let div = document.getElementById("bigBox");
-          div.scrollTop = div.scrollHeight;
-        },
-      },
-    });
-  </script>
+    },
+  });
+</script>
 </html>
-
