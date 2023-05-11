@@ -10,10 +10,10 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.javasm</groupId>
-    <artifactId>0827boot</artifactId>
+    <groupId>com.javaDemo</groupId>
+    <artifactId>chatDemo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>1.8</java.version>
@@ -160,13 +160,31 @@
 
 
     <build>
-        <finalName>0827boot</finalName>
+        <finalName>chatDemo</finalName>
 
         <plugins>
-            <!--对springboot项目打jar使用,与maven默认的打包有区别-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!--  指定该Main Class为全局的唯一入口 -->
+                    <mainClass>com.java.Application</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal><!--可以把依赖的包都打包到生成的Jar包中-->
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
