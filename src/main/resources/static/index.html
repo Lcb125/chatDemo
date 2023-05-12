@@ -97,7 +97,7 @@
 
 
   .msgCss {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
   }
 
@@ -161,7 +161,7 @@
                 border-radius: 50%;
                 padding-right: 10px;
               "
-                    src="./img/dianxiaoer.jpg"
+                    src="./img/support.jpg"
                     alt=""
             />
             <div class="dianxiaoer" style="background-color: #b8e46f;" v-if="item && item.link == ''">{{item.text}}</div>
@@ -178,7 +178,7 @@
                 border-radius: 50%;
                 padding-left: 10px;
               "
-                    src="./img/OIP.jpg"
+                    src="./img/user.jpg"
                     alt=""
             />
             <div  class="user" style="background-color: rgb(136, 205, 234);">
@@ -245,7 +245,7 @@
   //  console.log(mainDom.style.height)
   let headerDom = document.getElementsByClassName("header")[0];
   headerDom.style.height = htmlHeight * 0.1 + 'px';
-  headerDom.style.fontSize = htmlWidth / 15 + 'px';
+  headerDom.style.fontSize = htmlWidth / 18 + 'px';
   let footerDom = document.getElementsByClassName("footer")[0];
   footerDom.style.height = htmlHeight * 0.08 + 'px';
 
@@ -321,7 +321,7 @@
           this.input3 = "";
         }else{
           Vue.prototype.$message({
-            message: 'Please fill in your question',
+            message: 'Please enter your question',
             type: 'warning',
             center: true
           });
