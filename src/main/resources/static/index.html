@@ -60,7 +60,7 @@
     height: 100%;
   }
 
-  .el-header, .el-footer {
+  .el-header {
     background-color: #4a85d3;
     color: #333;
     text-align: center;
@@ -70,6 +70,11 @@
     align-items: center;
     justify-content: center;
     /* line-height: 375%; */
+  }
+
+  .el-footer {
+    /* padding: 0px 0px; */
+    background-color: #E9EEF3;
   }
 
   .el-main {
@@ -91,25 +96,41 @@
 
 
 
-  .input-with-select {
-    /* width: 70%; */
-    height: 100%;
-    line-height: 100%;
-  }
-  .el-input__inner {
-    height: 100%;
-    line-height: 80%;
-    font-size: medium;
-    /* text-align: center; */
-  }
-
-
-
   .msgCss {
     font-size: 16px;
     font-weight: 500;
   }
 
+  .dianxiaoer {
+    width: 60%;
+    padding: 12px;
+    border-radius: 10px;
+    margin: 0px 50px 0px 50px;
+  }
+
+  .user {
+    text-align: left;
+    padding: 12px;
+    border-radius: 10px;
+    margin: 0px 50px 0px 60px;
+  }
+
+  .input{
+    width: 80%;
+    height: 100%;
+    float: left;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .button{
+    width: 20%;
+    height: 100%;
+    float: right;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 </style>
 <body>
 <div id="app" class="all">
@@ -130,8 +151,9 @@
                 class="msgCss"
                 :style="{textAlign: item.align}"
         >
-          <span class="left" v-if="item && item.align == 'left'">
+          <div class="left" v-if="item && item.align == 'left'">
             <img
+
                     style="
                 width: 50px;
                 height: 50px;
@@ -142,46 +164,56 @@
                     src="./img/dianxiaoer.jpg"
                     alt=""
             />
-            <span v-if="item && item.link == ''">{{item.text}}</span>
-            <span v-if="item && item.link"
-            >: <a :href="item.link" target="_blank">{{item.text}}</a></span
-            >
-          </span>
-          <span class="right" v-if="item && item.align == 'right'">
-            {{item.text}}<img
-                  style="
+            <div class="dianxiaoer" style="background-color: #b8e46f;" v-if="item && item.link == ''">{{item.text}}</div>
+
+
+          </div>
+
+          <div class="right" v-if="item && item.align == 'right'">
+            <img
+                    style="
                 width: 50px;
                 height: 50px;
                 vertical-align: middle;
                 border-radius: 50%;
-                padding-right: 10px;
                 padding-left: 10px;
               "
-                  src="./img/OIP.jpg"
-                  alt=""
-          />
-          </span>
+                    src="./img/OIP.jpg"
+                    alt=""
+            />
+            <div  class="user" style="background-color: rgb(136, 205, 234);">
+              {{item.text}}
+            </div>
+          </div>
+
         </div>
       </div>
 
     </el-main>
     <el-footer class="footer">
-      <el-input
-              placeholder="Your question"
-              v-model="input3"
-              class="input-with-select"
-              :autofocus="true"
-              ref="serachBox"
-      >
-        <el-button
-                :loading="loading"
-                @keydown.enter.native="handleMsg"
-                slot="append"
-                type="primary"
-                @click="handleMsg"
-        >Send</el-button
-        >
-      </el-input>
+
+      <div style="width: 100%; height: 100%;">
+        <div class="input">
+          <el-input
+                  type="textarea"
+                  :autosize="{ minRows: 1, maxRows: 5}"
+                  placeholder="Your question"
+                  class="input-with-select"
+                  v-model="input3"
+                  ref="serachBox">
+          </el-input>
+        </div>
+        <div class="button">
+          <el-button
+                  :loading="buttonLoading"
+                  @keydown.enter.native="handleMsg"
+                  type="success"
+                  size="small"
+                  @click="handleMsg">
+            Send</el-button>
+        </div>
+      </div>
+
     </el-footer>
 
   </el-container>
@@ -265,7 +297,7 @@
         // visible: false,
         input3: "",
         list: [],
-        loading: false,
+        buttonLoading: false,
       };
     },
     created: function () {
@@ -282,58 +314,64 @@
       async handleMsg() {
         // console.log(this.input3, "发送信息");
         if (this.input3 !== "") {
-          this.loading = true;
+          this.buttonLoading = true;
           await this.list.push({ align: "right", text: this.input3 });
           this.scrollTop11();
           this.getMsg();
           this.input3 = "";
-          // console.log(this.input3)
-
+        }else{
+          Vue.prototype.$message({
+            message: 'Please fill in your question',
+            type: 'warning',
+            center: true
+          });
         }
       },
       getMsg() {
+        let self = this;
         // 处理接口请求 返回需要的数据
         axios
-                .post("http://localhost:8080/user/testChat", { content: this.input3,code: '135790' })
-                .then(async (response) => {
-                  // console.log(response);
-                  if (response.status == 200) {
+            .post("http://localhost:8080/user/testChat", { content: this.input3,code: '135790' })
+            .then(async (response) => {
+              // console.log(response);
+              if (response.status == 200) {
 
-                    // 自行处理需要的数据
+                // 自行处理需要的数据
 
-                    const msg = response.data;
-                    let listMsg = {
-                      align: "left",
-                      text: msg,
-                      link: "",
-                    };
-                    // if (msg.flag == 1) {
-                    //   const splitMsg = msg.answer.split("：");
-                    //   listMsg.text = splitMsg[0];
-                    //   listMsg.link = splitMsg[1];
-                    // }
-                    await this.list.push(listMsg);
-                    this.scrollTop11();
-                  }else{
-
-                    Vue.prototype.$message({
-                      message: '获取结果超时',
-                      type: 'error'
-                    });
-
-                  }
-                  this.loading = false;
-                })
-                .catch(function (error) {
-                  console.log(error);
-                  Vue.prototype.$message({
-                    message: '获取结果超时',
-                    type: 'error'
-                  });
-                  this.loading = false;
+                const msg = response.data;
+                let listMsg = {
+                  align: "left",
+                  text: msg,
+                  link: "",
+                };
+                // if (msg.flag == 1) {
+                //   const splitMsg = msg.answer.split("：");
+                //   listMsg.text = splitMsg[0];
+                //   listMsg.link = splitMsg[1];
+                // }
+                self.buttonLoading = false;
+                await this.list.push(listMsg);
+                this.scrollTop11();
+              }else{
+                self.buttonLoading = false;
+                Vue.prototype.$message({
+                  message: 'Failed to get response',
+                  type: 'error',
+                  center: true
                 });
 
-        this.loading = false;
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+              self.buttonLoading = false;
+              Vue.prototype.$message({
+                message: 'Failed to get response',
+                type: 'error',
+                center: true
+              });
+            });
+
       },
       // 处理滚动条一直保持最下方
       scrollTop11() {
@@ -343,13 +381,7 @@
           infoBox[0].scrollTop = infoBox[0].scrollHeight;
         },0)
       },
-      failAlert() {
-        console.log(11111111111111111)
-        this.$message({
-          message: '获取结果超时',
-          type: 'error'
-        });
-      },
+
     },
   });
 </script>
