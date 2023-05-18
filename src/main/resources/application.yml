@@ -2,18 +2,16 @@ server:
   port: 8080
   servlet:
     context-path: /
-#jdbc:
-#  url: jdbc:mysql://localhost:3305/804b
-#  username: root
-#  password: root
-#  driver-classname: com.mysql.jdbc.Driver
-#  init-size: 10
-#  ddate: 2020/12/12 12:12:12
-#  str-list: aa,bb,cc
-#    - a
-#    - b
-#    - c
-  maps: {a: 12,b: 13,d: 14}
+spring:
+  #数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://sh-cynosdbmysql-grp-dq4lwxcu.sql.tencentcdb.com:20065/chatInfo_schema?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    username: root
+    password: Ican_2023
+  # MyBatis配置
+mybatis:
+  mapper-locations: com/chat/mapper/*Mapper.xml
 
 user:
   uname: fyt
@@ -41,3 +39,7 @@ chatgpt:
   # 最大 Token 数
   # 该值越大每次返回的结果越随机，即相似度越小
 #  text-davinci-003
+
+
+switch:
+  ifCheck: ifCheck

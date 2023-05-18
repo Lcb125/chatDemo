@@ -96,16 +96,11 @@
 
 
 
-  .msgCss {
-    font-size: 15px;
-    font-weight: 500;
-  }
-
   .dianxiaoer {
-    width: 60%;
+    /* width: 60%; */
     padding: 12px;
     border-radius: 10px;
-    margin: 0px 50px 0px 50px;
+    margin: 0px 60px 0px 50px;
   }
 
   .user {
@@ -114,7 +109,6 @@
     border-radius: 10px;
     margin: 0px 50px 0px 60px;
   }
-
   .input{
     width: 80%;
     height: 100%;
@@ -131,6 +125,10 @@
     align-items: center;
     justify-content: center;
   }
+
+  .el-dialog__headerbtn {
+    display: none;
+  }
 </style>
 <body>
 <div id="app" class="all">
@@ -146,6 +144,31 @@
     <el-main class="main">
 
       <div style="overflow-y: auto" id="bigBox">
+
+        <div>
+          <el-dialog
+                  title="Please enter your code"
+                  :visible.sync="dialogVisible"
+                  width="50%"
+                  :showClose="false"
+                  :before-close="beforeClose"
+                  center="true">
+            <span>
+              <el-input
+                      type="text"
+                      placeholder="only use numbers"
+                      v-model.number="userNo"
+                      maxlength="4"
+                      show-word-limit
+                      oninput="value=value.replace(/[^0-9.]/g,'')" />
+              >
+            </span>
+            <span slot="footer" class="dialog-footer">
+              <el-button :loading="checkLoading" type="primary" @click="handleClose">check</el-button>
+            </span>
+          </el-dialog>
+        </div>
+
         <div
                 v-for="(item, index) in list"
                 class="msgCss"
@@ -298,6 +321,10 @@
         input3: "",
         list: [],
         buttonLoading: false,
+        answerLoading: false,
+        dialogVisible: true,
+        checkLoading: false,
+        userNo: ''
       };
     },
     created: function () {
@@ -309,6 +336,7 @@
       //     this.handleMsg();
       //   }
       // });
+      this.querySwitch();
     },
     methods: {
       async handleMsg() {
@@ -329,49 +357,62 @@
       },
       getMsg() {
         let self = this;
+        var visitId = self.getMark();
         // 处理接口请求 返回需要的数据
         axios
-            .post("http://localhost:8080/user/testChat", { content: this.input3,code: '135790' })
-            .then(async (response) => {
-              // console.log(response);
-              if (response.status == 200) {
+                .post("http://localhost:8080/user/testChat", { content: self.input3,userNo: self.userNo , uniqueIdentification: visitId})
+                .then(async (response) => {
+                  // console.log(response);
+                  if (response.status === 200) {
 
-                // 自行处理需要的数据
+                    // 自行处理需要的数据
+                    if (response.data == '设备已满'){
+                      self.buttonLoading = false;
+                      Vue.prototype.$message({
+                        message: 'The current numbered device is full or the number of times in the day is exhausted',
+                        type: 'error',
+                        center: true
+                      });
+                    }else{
+                      // 自行处理需要的数据
+                      const msg = response.data;
+                      let listMsg = {
+                        align: "left",
+                        text: msg,
+                        link: "",
+                      };
+                      // if (msg.flag == 1) {
+                      //   const splitMsg = msg.answer.split("：");
+                      //   listMsg.text = splitMsg[0];
+                      //   listMsg.link = splitMsg[1];
+                      // }
 
-                const msg = response.data;
-                let listMsg = {
-                  align: "left",
-                  text: msg,
-                  link: "",
-                };
-                // if (msg.flag == 1) {
-                //   const splitMsg = msg.answer.split("：");
-                //   listMsg.text = splitMsg[0];
-                //   listMsg.link = splitMsg[1];
-                // }
-                self.buttonLoading = false;
-                await this.list.push(listMsg);
-                this.scrollTop11();
-              }else{
-                self.buttonLoading = false;
-                Vue.prototype.$message({
-                  message: 'Failed to get response',
-                  type: 'error',
-                  center: true
+                      self.buttonLoading = false;
+                      await this.list.push(listMsg);
+                      this.scrollTop11();
+                    }
+
+                  }else{
+                    self.buttonLoading = false;
+
+                    Vue.prototype.$message({
+                      message: 'Failed to get response',
+                      type: 'error',
+                      center: true
+                    });
+
+                  }
+                  // this.buttonLoading = false;
+                }).catch(function (error) {
+                  console.log(error);
+                  console.log('this'+this)
+                  self.buttonLoading = false;
+                  Vue.prototype.$message({
+                    message: 'Failed to get response',
+                    type: 'error',
+                    center: true
+                  });
                 });
-
-              }
-            })
-            .catch(function (error) {
-              console.log(error);
-              self.buttonLoading = false;
-              Vue.prototype.$message({
-                message: 'Failed to get response',
-                type: 'error',
-                center: true
-              });
-            });
-
       },
       // 处理滚动条一直保持最下方
       scrollTop11() {
@@ -381,6 +422,116 @@
           infoBox[0].scrollTop = infoBox[0].scrollHeight;
         },0)
       },
+
+      handleClose() {
+        let self = this;
+        self.getMark();
+        self.checkLoading = true;
+        if(self.userNo<1000){
+          Vue.prototype.$message({
+            message: 'Please enter in a 4-digit number',
+            type: 'error',
+            center: true
+          });
+          self.checkLoading = false;
+        }else{
+          // var identification = navigator.userAgent;
+          // console.log('mark:'+mark)
+          var visitId = self.getMark();
+          axios.post("http://localhost:8080/user/requestAccess", { accessCode: self.userNo,deviceId: visitId })
+                  .then(async (response) => {
+                    if (response.status == 200) {
+                      Vue.prototype.$message({
+                        message: 'Verification passed',
+                        type: 'success',
+                        center: true
+                      });
+                      self.dialogVisible = false;
+                    }else{
+                      Vue.prototype.$message({
+                        message: 'Verification failure',
+                        type: 'error',
+                        center: true
+                      });
+                    }
+                    self.checkLoading = false;
+                  })
+                  .catch(function (error) {
+                    self.checkLoading = false;
+                    Vue.prototype.$message({
+                      message: 'Failed to get response',
+                      type: 'error',
+                      center: true
+                    });
+                  });
+        }
+
+      },
+      beforeClose(done) {
+        // this.$confirm('确认关闭？')
+        //   .then(_ => {
+        //     done();
+        //   })
+        //   .catch(_ => {});
+        Vue.prototype.$message({
+          message: 'Please enter in a 4-digit number',
+          type: 'warning',
+          center: true
+        });
+      },
+      getMark(){
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const txt = 'http://www.koal.com/';
+        ctx.textBaseline = "top";
+        ctx.font = "14px 'Arial'";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#f60";
+        ctx.fillRect(125, 1, 62, 20);
+        ctx.fillStyle = "#069";
+        ctx.fillText(txt, 2, 15);
+        ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+        ctx.fillText(txt, 4, 17);
+
+        const b64 = canvas.toDataURL().replace("data:image/png;base64,", "");
+        const bin = atob(b64);
+        const visitId = this.bin2hex(bin.slice(-16, -12));
+        console.log('visitId======'+visitId)
+        return visitId;
+      },
+      bin2hex(str) {
+        var result = "";
+        for (let i = 0; i < str.length; i++) {
+          result += this.int16ToHex(str.charCodeAt(i));
+        }
+        return result;
+      },
+      int16ToHex(i) {
+        var result = i.toString(16);
+        var j = 0;
+        while (j + result.length < 4) {
+          result = "0" + result;
+          j++;
+        }
+        return result;
+      },
+      querySwitch(){
+        // 获取是否开启校验
+        axios.get("http://localhost:8080/user/querySwitch")
+                .then(async (response) => {
+                  if (response.data === "打开校验") {
+                    this.dialogVisible = true;
+                  }else{
+                    this.dialogVisible = false;
+                  }
+                }).catch(function (error) {
+          Vue.prototype.$message({
+            message: 'Failed to get response',
+            type: 'error',
+            center: true
+          });
+        });
+      }
 
     },
   });

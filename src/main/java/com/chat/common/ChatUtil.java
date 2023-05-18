@@ -1,4 +1,4 @@
-package com.java.common;
+package com.chat.common;
 
 import cn.hutool.core.convert.ConvertException;
 import cn.hutool.http.*;

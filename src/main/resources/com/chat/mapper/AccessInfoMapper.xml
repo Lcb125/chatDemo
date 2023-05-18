@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chat.sys.mapper.AccessInfoMapper">
+
+    <resultMap id="userResult" type="com.chat.sys.entity.AccessInfo">
+
+        <!-- 此处将实体类与数据库中进行了映射，property是实体类中的变量名-->
+        <id property="id" column="id"></id>
+        <result property="accessCode" column="access_code"></result>
+        <result property="deviceId" column="device_id"></result>
+        <result property="accessLevel" column="access_level"></result>
+        <result property="availableNum" column="available_num"></result>
+        <result property="accessType" column="access_type"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <insert id="insertAccessInfo" parameterType="com.chat.sys.entity.AccessInfo">
+        insert into access_info(access_code,device_id,access_level,available_num,access_type,update_time)
+        values(#{accessCode},#{deviceId},#{accessLevel},#{availableNum},#{accessType},#{updateTime});
+    </insert>
+
+
+    <select id="queryByAccessCode" parameterType="java.lang.Integer" resultMap="userResult">
+        SELECT  * FROM  access_info where access_code = #{access_code};
+    </select>
+
+    <update id="updateAccessInfo" parameterType="com.chat.sys.entity.AccessInfo">
+        update access_info
+        <trim prefix="set" suffixOverrides=",">
+            <if test="deviceId!=null and deviceId!=''">
+                device_id = #{deviceId},
+            </if>
+            <if test="accessLevel!=null and accessLevel!=''">
+                access_level = #{accessLevel},
+            </if>
+            <if test="availableNum!=null">
+                available_num = #{availableNum},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        where id = #{id};
+    </update>
+    
+    <select id="queryAccess" resultMap="userResult">
+        selelct * from access_info;
+    </select>
+</mapper>

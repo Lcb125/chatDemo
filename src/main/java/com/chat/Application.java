@@ -1,13 +1,13 @@
-package com.java;
+package com.chat;
 
-import io.github.asleepyfish.annotation.EnableChatGPT;
-import org.springframework.boot.Banner;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @SpringBootApplication
+@MapperScan("com.chat.sys.mapper")
 //@EnableChatGPT
 //@PropertySource("classpath:jdbc.properties")//加载自定义properties配置文件
 //@ImportResource("classpath:spring.xml")//加载自定义的xml配置文件
