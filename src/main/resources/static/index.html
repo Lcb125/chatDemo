@@ -84,16 +84,6 @@
     /* line-height: 100%; */
   }
 
-  /* .header { */
-  /* position: fixed;
-  width: 100%;
-  height: 7%;
-  text-align: center;
-  background: rgb(80, 176, 185); */
-  /* overflow: auto; */
-  /* position: absolute; */
-  /* } */
-
 
 
   .dianxiaoer {
@@ -360,7 +350,7 @@
         var visitId = self.getMark();
         // 处理接口请求 返回需要的数据
         axios
-                .post("http://localhost:8080/user/testChat", { content: self.input3,userNo: self.userNo , uniqueIdentification: visitId})
+                .post("http://150.158.173.37:8090/user/testChat", { content: self.input3,userNo: self.userNo , uniqueIdentification: visitId})
                 .then(async (response) => {
                   // console.log(response);
                   if (response.status === 200) {
@@ -438,7 +428,7 @@
           // var identification = navigator.userAgent;
           // console.log('mark:'+mark)
           var visitId = self.getMark();
-          axios.post("http://localhost:8080/user/requestAccess", { accessCode: self.userNo,deviceId: visitId })
+          axios.post("http://150.158.173.37:8090/user/requestAccess", { accessCode: self.userNo,deviceId: visitId })
                   .then(async (response) => {
                     if (response.status == 200) {
                       Vue.prototype.$message({
@@ -517,7 +507,7 @@
       },
       querySwitch(){
         // 获取是否开启校验
-        axios.get("http://localhost:8080/user/querySwitch")
+        axios.get("http://150.158.173.37:8090/user/querySwitch")
                 .then(async (response) => {
                   if (response.data === "打开校验") {
                     this.dialogVisible = true;

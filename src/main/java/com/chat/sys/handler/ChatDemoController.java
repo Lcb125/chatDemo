@@ -76,16 +76,19 @@ public class ChatDemoController {
             if (accessInfos.size()==0){
                 return ResponseEntity.status(500).body("未查询到用户信息");
             }else {
+                boolean checkResult = false;
                 for (AccessInfo accessInfo : accessInfos){
 //                匹配到库里的设备标识，则正常调用，当天使用次数减一
                     if(StringUtils.equals(accessInfo.getDeviceId(),req.getUniqueIdentification())){
-                        validUser.setAvailableNum(accessInfo.getAvailableNum()-1);
+                        checkResult = true;
                     }
                     if (accessInfo.getAvailableNum()>=1){
                         validUser.setId(accessInfo.getId());
+                        validUser.setAvailableNum(accessInfo.getAvailableNum()-1);
+
                     }
                 }
-                if(validUser.getId() == null){
+                if(validUser.getId() == null || !checkResult){
                     System.out.println("次数用尽");
                     return ResponseEntity.ok("设备已满");
                 }
