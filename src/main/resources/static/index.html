@@ -350,10 +350,10 @@
         var visitId = self.getMark();
         // 处理接口请求 返回需要的数据
         axios
-                .post("http://150.158.173.37:8090/user/testChat", { content: self.input3,userNo: self.userNo , uniqueIdentification: visitId})
+                .post("http://150.158.173.37:8090/api/chat/testChat", { content: self.input3,userNo: self.userNo , uniqueIdentification: visitId})
                 .then(async (response) => {
                   // console.log(response);
-                  if (response.status === 200) {
+                  if (response.data.code === 200) {
 
                     // 自行处理需要的数据
                     if (response.data == '设备已满'){
@@ -428,9 +428,9 @@
           // var identification = navigator.userAgent;
           // console.log('mark:'+mark)
           var visitId = self.getMark();
-          axios.post("http://150.158.173.37:8090/user/requestAccess", { accessCode: self.userNo,deviceId: visitId })
+          axios.post("http://150.158.173.37:8090/api/chat/requestAccess", { accessCode: self.userNo,deviceId: visitId })
                   .then(async (response) => {
-                    if (response.status == 200) {
+                    if (response.data.code == 200) {
                       Vue.prototype.$message({
                         message: 'Verification passed',
                         type: 'success',
@@ -507,9 +507,9 @@
       },
       querySwitch(){
         // 获取是否开启校验
-        axios.get("http://150.158.173.37:8090/user/querySwitch")
+        axios.get("http://150.158.173.37:8090/api/config/querySwitch")
                 .then(async (response) => {
-                  if (response.data === "打开校验") {
+                  if (response.data.data === "打开校验") {
                     this.dialogVisible = true;
                   }else{
                     this.dialogVisible = false;

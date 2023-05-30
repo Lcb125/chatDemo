@@ -1,12 +1,13 @@
 package com.chat.sys.entity;
 
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class ConfigInfo {
+public class MsgInfo {
 
     /**
      * 主键
@@ -16,27 +17,18 @@ public class ConfigInfo {
     /**
      * 配置类型
      */
-    private String codeType;
+    private String msgType;
 
     /**
      * 配置key
      */
-    private String codeKey;
+    private String msgKey;
 
     /**
      * 配置value
      */
-    private String codeValue;
+    private String msgValue;
 
-    /**
-     * 配置描述
-     */
-    private String codeDesc;
-
-    /**
-     * 配置描述
-     */
-    private String status;
 
     /**
      * 创建时间
@@ -49,15 +41,5 @@ public class ConfigInfo {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
-
-    /**
-     * 创建人
-     */
-    private String createBy;
-
-    /**
-     * 更新人
-     */
-    private Integer updateBy;
 
 }

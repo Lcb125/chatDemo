@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chat.sys.mapper.MsgMapper">
+
+    <resultMap id="msgResult" type="com.chat.sys.entity.MsgInfo">
+
+        <!-- 此处将实体类与数据库中进行了映射，property是实体类中的变量名-->
+        <id property="id" column="id"></id>
+        <result property="msgType" column="msg_type"></result>
+        <result property="msgKey" column="msg_key"></result>
+        <result property="msgValue" column="msg_value"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <!--    <insert id="insertUser" parameterType="com.chat.sys.entity.AccessInfo">-->
+    <!--        insert into user_info(user_no,unique_identification,user_level,number_of_times_available)-->
+    <!--        values(#{userNo},#{uniqueIdentification},#{userLevel},#{numberOfTimesAvailable});-->
+    <!--    </insert>-->
+
+    <sql id="Base_Column_List" >
+        id, msg_type, msg_key, msg_value, create_time, update_time
+    </sql>
+
+<!--    <select id="queryByCodeKey" parameterType="java.lang.String" resultType="java.lang.String">-->
+<!--        SELECT  code_value FROM  config_info where code_key = #{codeKey};-->
+<!--    </select>-->
+
+<!--    <update id="updateConfigInfo" parameterType="com.chat.sys.entity.ConfigInfo">-->
+<!--        update config_info-->
+<!--        <trim prefix="set" suffixOverrides=",">-->
+<!--            <if test="codeType!=null and codeType!=''">-->
+<!--                code_type = #{codeType},-->
+<!--            </if>-->
+<!--            <if test="codeKey!=null and codeKey!=''">-->
+<!--                code_key = #{codeKey},-->
+<!--            </if>-->
+<!--            <if test="codeValue!=null and codeValue!=''">-->
+<!--                code_value = #{codeValue},-->
+<!--            </if>-->
+<!--            <if test="codeDesc!=null and codeDesc!=''">-->
+<!--                code_desc = #{codeDesc},-->
+<!--            </if>-->
+<!--            <if test="updateTime!=null">-->
+<!--                update_time = #{updateTime},-->
+<!--            </if>-->
+<!--        </trim>-->
+<!--        where id = #{id}-->
+<!--    </update>-->
+
+<!--    <delete id="deleteConfigInfo" parameterType="java.lang.Integer">-->
+<!--        delete from config_info where id = #{id};-->
+<!--    </delete>-->
+
+
+    <select id="queryMsg" resultMap="msgResult" parameterType="com.chat.sys.entity.MsgInfo">
+        select
+        <include refid="Base_Column_List" />
+        from msg_info
+        <where>
+            <if test="msgType!=null and msgType!=''">
+                and msg_type = #{msgType}
+            </if>
+            <if test="msgKey!=null and msgKey!=''">
+                and msg_key = #{msgKey}
+            </if>
+        </where>
+    </select>
+</mapper>

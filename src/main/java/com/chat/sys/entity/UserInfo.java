@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class ConfigInfo {
+public class UserInfo {
 
     /**
      * 主键
@@ -14,29 +14,19 @@ public class ConfigInfo {
     private Integer id;
 
     /**
-     * 配置类型
+     * 用户名称
      */
-    private String codeType;
+    private String userName;
 
     /**
-     * 配置key
+     * 用户密码
      */
-    private String codeKey;
+    private String password;
 
     /**
-     * 配置value
+     * 用户类型
      */
-    private String codeValue;
-
-    /**
-     * 配置描述
-     */
-    private String codeDesc;
-
-    /**
-     * 配置描述
-     */
-    private String status;
+    private String userType;
 
     /**
      * 创建时间
@@ -45,19 +35,11 @@ public class ConfigInfo {
     private Date createTime;
 
     /**
-     * 更新时间
+     * 创建时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
-    /**
-     * 创建人
-     */
-    private String createBy;
 
-    /**
-     * 更新人
-     */
-    private Integer updateBy;
 
 }

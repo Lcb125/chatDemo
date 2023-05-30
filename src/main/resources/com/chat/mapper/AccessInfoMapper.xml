@@ -11,18 +11,24 @@
         <result property="accessLevel" column="access_level"></result>
         <result property="availableNum" column="available_num"></result>
         <result property="accessType" column="access_type"></result>
+        <result property="status" column="status"></result>
+        <result property="language" column="language"></result>
         <result property="createTime" column="create_time"></result>
         <result property="updateTime" column="update_time"></result>
     </resultMap>
 
+    <sql id="Base_Column_List" >
+        id, access_code, device_id, access_level, available_num, access_type, status, language, create_time, update_time
+    </sql>
+
     <insert id="insertAccessInfo" parameterType="com.chat.sys.entity.AccessInfo">
-        insert into access_info(access_code,device_id,access_level,available_num,access_type,update_time)
-        values(#{accessCode},#{deviceId},#{accessLevel},#{availableNum},#{accessType},#{updateTime});
+        insert into access_info(access_code,device_id,access_level,available_num,access_type, status, language,,update_time)
+        values(#{accessCode},#{deviceId},#{accessLevel},#{availableNum},#{accessType},#{status},#{language},#{updateTime});
     </insert>
 
 
     <select id="queryByAccessCode" parameterType="java.lang.Integer" resultMap="userResult">
-        SELECT  * FROM  access_info where access_code = #{access_code};
+        SELECT  <include refid="Base_Column_List" /> FROM  access_info where access_code = #{accessCode};
     </select>
 
     <update id="updateAccessInfo" parameterType="com.chat.sys.entity.AccessInfo">
@@ -34,17 +40,41 @@
             <if test="accessLevel!=null and accessLevel!=''">
                 access_level = #{accessLevel},
             </if>
+            <if test="status!=null and status!=''">
+                status = #{status},
+            </if>
             <if test="availableNum!=null">
                 available_num = #{availableNum},
+            </if>
+            <if test="language!=null and language!=''">
+                language = #{language},
             </if>
             <if test="updateTime!=null">
                 update_time = #{updateTime},
             </if>
         </trim>
-        where id = #{id};
+        <where>
+            <if test="id!=null">
+                and id = #{id}
+            </if>
+            <if test="accessCode!=null">
+                and access_code = #{accessCode}
+            </if>
+        </where>
     </update>
     
-    <select id="queryAccess" resultMap="userResult">
-        selelct * from access_info;
+    <select id="queryAccess" resultMap="userResult" parameterType="com.chat.sys.entity.AccessInfo">
+        select
+        <include refid="Base_Column_List" />
+        from access_info
+        <where>
+            <if test="accessCode!=null">
+                and access_code = #{accessCode}
+            </if>
+        </where>
     </select>
+
+    <delete id="deleteAccessInfo" parameterType="com.chat.sys.entity.AccessInfo">
+        delete from access_info  where id = #{id};
+    </delete>
 </mapper>

@@ -4,24 +4,29 @@ import com.chat.common.AddressUtil;
 import com.chat.common.ChatUtil;
 import com.chat.sys.entity.AccessInfo;
 import com.chat.sys.entity.ChatGPTReq;
-import com.chat.sys.service.QueryCodeService;
+import com.chat.sys.entity.Enum.RespEnum;
+import com.chat.sys.entity.ResponseResult;
+import com.chat.sys.entity.UserInfo;
+import com.chat.sys.entity.page.PageRequest;
+import com.chat.sys.entity.page.PageResponse;
+import com.chat.sys.service.ConfigInfoService;
 import com.chat.sys.service.AccessInfoService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 
+@Slf4j
 @Controller
-@RequestMapping("user")
+@RequestMapping("/chat")
 public class ChatDemoController {
 
 
@@ -48,6 +53,9 @@ public class ChatDemoController {
     private String apiKey;
 
 
+    private static final  String STATUS = "A";
+
+
     @Value("${switch.ifCheck}")
     private String ifCheck;
 
@@ -61,20 +69,20 @@ public class ChatDemoController {
     AccessInfoService accessInfoService;
 
     @Autowired
-    QueryCodeService queryCodeService;
+    ConfigInfoService configInfoService;
 
 
     @PostMapping(value = "/testChat")
     @ResponseBody
-    public ResponseEntity testChat(@RequestBody ChatGPTReq req)  {
+    public ResponseResult testChat(@RequestBody ChatGPTReq req)  {
 //        如果关闭校验则直接使用
-        String check = queryCodeService.queryByCodeKey(ifCheck);
+        String check = configInfoService.queryByCodeKey(ifCheck);
         if (StringUtils.equals("true",check)){
             //        根据前端传输的userNo查询用户信息
             List<AccessInfo> accessInfos = accessInfoService.queryByAccessCode(req.getUserNo());
             AccessInfo validUser = new AccessInfo();
             if (accessInfos.size()==0){
-                return ResponseEntity.status(500).body("未查询到用户信息");
+                return new ResponseResult(RespEnum.FAIL,"未查询到用户信息");
             }else {
                 boolean checkResult = false;
                 for (AccessInfo accessInfo : accessInfos){
@@ -90,7 +98,7 @@ public class ChatDemoController {
                 }
                 if(validUser.getId() == null || !checkResult){
                     System.out.println("次数用尽");
-                    return ResponseEntity.ok("设备已满");
+                    return new ResponseResult(RespEnum.SUCCESS,"设备已满");
                 }
                 validUser.setUpdateTime(new Date());
                 accessInfoService.updateAccessInfo(validUser);
@@ -102,93 +110,84 @@ public class ChatDemoController {
             result = chatUtil.chat(req.getContent());
         }catch (Exception e){
             System.out.println("chat接口报错："+e.getMessage());
-            return ResponseEntity.status(500).body("接口异常");
+            return new ResponseResult(RespEnum.FAIL,"接口异常");
         }
 
-        return ResponseEntity.ok(result);
+        return new ResponseResult(RespEnum.SUCCESS,result);
     }
 
-    @PostMapping(value = "/insertUser")
-    @ResponseBody
-    public ResponseEntity insertUser(@RequestBody AccessInfo accessInfo1)  {
 
-        Random random = new Random();
-        for (int i=0;i<11;i++){
-            int code = random.nextInt(9000) + 1000;
-            System.out.println(code);
-            AccessInfo accessInfo = new AccessInfo();
-            accessInfo.setAccessCode(code);
-            accessInfo.setAccessLevel("c");
-            accessInfoService.insertAccessInfo(accessInfo);
-
-        }
-//        boolean result = userInfoService.insertUser(userInfo);
-
-//        if (result){
-//            return ResponseEntity.ok("信息插入成功");
-//        }else {
-//            return ResponseEntity.status(500).body("信息插入失败");
-//        }
-        return ResponseEntity.ok("信息插入成功");
-
-    }
 
     @PostMapping(value = "/requestAccess")
     @ResponseBody
-    public ResponseEntity requestAccess(@RequestBody AccessInfo accessInfo)  {
+    public ResponseResult requestAccess(@RequestBody AccessInfo accessInfo)  {
 
         List<AccessInfo> users = accessInfoService.queryByAccessCode(accessInfo.getAccessCode());
 
         if (users.size()==1){
             AccessInfo getUser = users.get(0);
-            String value = queryCodeService.queryByCodeKey(getUser.getAccessLevel());
+            String value = configInfoService.queryByCodeKey(getUser.getAccessLevel());
             Integer times = Integer.valueOf(value);
             if (StringUtils.isEmpty(getUser.getDeviceId())){
 //                第一次进来给更新唯一标识，塞满当天使用次数
                 getUser.setAvailableNum(times);
-                getUser.setAccessType("L");//L类型为首次进入的记录，用来存放使用次数
+                getUser.setAccessType("P");//P为首次进入的记录,为主账号，用来存放使用次数
                 getUser.setUpdateTime(new Date());
                 getUser.setDeviceId(accessInfo.getDeviceId());
+                getUser.setStatus("A");
                 Boolean updateResult = accessInfoService.updateAccessInfo(getUser);
                 if (updateResult){
-                    return ResponseEntity.ok("首次进入，正常使用");
+                    return new ResponseResult(RespEnum.FIRST,"首次进入，正常使用");
                 }else {
-                    return ResponseEntity.status(500).body("首次进入更新信息失败，请稍后重试");
+                    return new ResponseResult(RespEnum.FAIL,"首次进入更新信息失败，请稍后重试");
                 }
             }else if (StringUtils.equals(getUser.getDeviceId(), accessInfo.getDeviceId())){
 //                库里已有登记记录，正常使用
-                return ResponseEntity.ok("已有记录，正常使用");
+                if (StringUtils.equals(STATUS,getUser.getStatus())){
+                    log.info("已有记录，正常使用："+getUser.getAccessCode());
+                    return new ResponseResult(RespEnum.SUCCESS,getUser);
+                }else {
+                    return new ResponseResult(RespEnum.FAIL,"已有记录，但被禁用");
+                }
+
             }else {
 //                与库里记录不匹配，可再加一条记录
                 accessInfo.setAccessLevel("c");
                 accessInfo.setAvailableNum(0);
-                accessInfo.setAccessType("M");//M类型为二次进入的记录，不用来存放使用次数
+                accessInfo.setAccessType("S");//S类型为二次进入的记录，为次账号，不用来存放使用次数
+                accessInfo.setStatus("A");
                 Boolean updateResult = accessInfoService.insertAccessInfo(accessInfo);
                 if (updateResult){
-                    return ResponseEntity.ok("二次进入，正常使用");
+                    log.info("二次进入，正常使用："+getUser.getAccessCode());
+                    return new ResponseResult(RespEnum.SUCCESS,getUser);
                 }else {
-                    return ResponseEntity.status(500).body("二进入插入信息失败，请稍后重试");
+                    return new ResponseResult(RespEnum.FAIL,"二次进入插入信息失败，请稍后重试");
                 }
             }
 
         }else if (users.size()==2){
+            AccessInfo access = new AccessInfo();
             for (AccessInfo user:users){
-                if (StringUtils.equals(accessInfo.getDeviceId(),user.getDeviceId())){
+                if (StringUtils.equals("P",user.getAccessType())){
+                    access.setLanguage(user.getLanguage());
+                }
+                if (StringUtils.equals(accessInfo.getDeviceId(),user.getDeviceId()) && StringUtils.equals(STATUS,user.getStatus())){
 
 //                    如设备标识和库里能对应的上，则正常使用
-                    return ResponseEntity.ok("记录已满，正常使用");
+                    log.info("记录已满，正常使用："+user.getAccessCode());
+                    return new ResponseResult(RespEnum.SUCCESS,user);
                 }
             }
-            return ResponseEntity.status(500).body("记录已满且唯一标识不匹配，当前设备不可用");
+            return new ResponseResult(RespEnum.FAIL,"记录已满且唯一标识不匹配或被禁用，当前设备不可用");
         }else {
-            return ResponseEntity.status(500).body("查不到用户信息");
+            return new ResponseResult(RespEnum.FAIL,"查不到用户信息");
         }
 
     }
 
     @PostMapping(value = "/getAddr")
     @ResponseBody
-    public ResponseEntity requestAccess(@RequestBody AccessInfo accessInfo, HttpServletRequest request) throws Exception {
+    public ResponseResult getAddr(@RequestBody AccessInfo accessInfo, HttpServletRequest request) throws Exception {
         System.out.println("userInfo=="+ accessInfo);
         String clientIP = addressUtil.getClientIP(request);
         System.out.println("clientIP=="+clientIP);
@@ -198,16 +197,7 @@ public class ChatDemoController {
     }
 
 
-    @GetMapping(value = "/querySwitch")
-    @ResponseBody
-    public ResponseEntity querySwitch() {
-        String switchValue = queryCodeService.queryByCodeKey(ifCheck);
-        if (StringUtils.equals("true",switchValue)){
-            return ResponseEntity.ok("打开校验");
-        }else {
-            return ResponseEntity.ok("关闭校验");
-        }
-    }
+
 
 
 }

@@ -19,5 +19,7 @@ public interface AccessInfoMapper {
 
     Boolean updateAccessInfo(AccessInfo accessInfo);
 
-    List<AccessInfo> queryAccess();
+    List<AccessInfo> queryAccess(AccessInfo accessInfo);
+
+    boolean deleteAccessInfo(AccessInfo accessInfo);
 }
