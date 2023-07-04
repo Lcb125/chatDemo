@@ -22,4 +22,5 @@ public interface AccessInfoMapper {
     List<AccessInfo> queryAccess(AccessInfo accessInfo);
 
     boolean deleteAccessInfo(AccessInfo accessInfo);
+
 }

@@ -54,6 +54,8 @@ public class ChatDemoController {
 
 
     private static final  String STATUS = "A";
+    private static final  String SELECTAPI = "API";
+    private static final  String CONFIGTYPE = "openai";
 
 
     @Value("${switch.ifCheck}")
@@ -97,7 +99,7 @@ public class ChatDemoController {
                     }
                 }
                 if(validUser.getId() == null || !checkResult){
-                    System.out.println("次数用尽");
+                    log.info("次数用尽");
                     return new ResponseResult(RespEnum.SUCCESS,"设备已满");
                 }
                 validUser.setUpdateTime(new Date());
@@ -107,9 +109,14 @@ public class ChatDemoController {
 
         String result = "";
         try {
-            result = chatUtil.chat(req.getContent());
+            if (StringUtils.equals(CONFIGTYPE,req.getSelectAPI())){
+                result = chatUtil.chat(req.getContent());
+            }else {
+                result = chatUtil.chatByNewAPI(req.getContent());
+            }
+
         }catch (Exception e){
-            System.out.println("chat接口报错："+e.getMessage());
+            log.info("chat接口报错："+e.getMessage());
             return new ResponseResult(RespEnum.FAIL,"接口异常");
         }
 
@@ -124,8 +131,12 @@ public class ChatDemoController {
 
         List<AccessInfo> users = accessInfoService.queryByAccessCode(accessInfo.getAccessCode());
 
+        String selectAPI = configInfoService.queryByCodeKey(SELECTAPI);
+
         if (users.size()==1){
             AccessInfo getUser = users.get(0);
+            //塞入选择使用API
+            getUser.setSelectAPI(selectAPI);
             String value = configInfoService.queryByCodeKey(getUser.getAccessLevel());
             Integer times = Integer.valueOf(value);
             if (StringUtils.isEmpty(getUser.getDeviceId())){
@@ -137,7 +148,7 @@ public class ChatDemoController {
                 getUser.setStatus("A");
                 Boolean updateResult = accessInfoService.updateAccessInfo(getUser);
                 if (updateResult){
-                    return new ResponseResult(RespEnum.FIRST,"首次进入，正常使用");
+                    return new ResponseResult(RespEnum.FIRST,getUser);
                 }else {
                     return new ResponseResult(RespEnum.FAIL,"首次进入更新信息失败，请稍后重试");
                 }
@@ -145,6 +156,7 @@ public class ChatDemoController {
 //                库里已有登记记录，正常使用
                 if (StringUtils.equals(STATUS,getUser.getStatus())){
                     log.info("已有记录，正常使用："+getUser.getAccessCode());
+
                     return new ResponseResult(RespEnum.SUCCESS,getUser);
                 }else {
                     return new ResponseResult(RespEnum.FAIL,"已有记录，但被禁用");
@@ -152,7 +164,7 @@ public class ChatDemoController {
 
             }else {
 //                与库里记录不匹配，可再加一条记录
-                accessInfo.setAccessLevel("c");
+                accessInfo.setAccessLevel("L");
                 accessInfo.setAvailableNum(0);
                 accessInfo.setAccessType("S");//S类型为二次进入的记录，为次账号，不用来存放使用次数
                 accessInfo.setStatus("A");
@@ -172,7 +184,7 @@ public class ChatDemoController {
                     access.setLanguage(user.getLanguage());
                 }
                 if (StringUtils.equals(accessInfo.getDeviceId(),user.getDeviceId()) && StringUtils.equals(STATUS,user.getStatus())){
-
+                    user.setSelectAPI(selectAPI);
 //                    如设备标识和库里能对应的上，则正常使用
                     log.info("记录已满，正常使用："+user.getAccessCode());
                     return new ResponseResult(RespEnum.SUCCESS,user);
@@ -188,11 +200,11 @@ public class ChatDemoController {
     @PostMapping(value = "/getAddr")
     @ResponseBody
     public ResponseResult getAddr(@RequestBody AccessInfo accessInfo, HttpServletRequest request) throws Exception {
-        System.out.println("userInfo=="+ accessInfo);
+        log.info("userInfo=="+ accessInfo);
         String clientIP = addressUtil.getClientIP(request);
-        System.out.println("clientIP=="+clientIP);
+        log.info("clientIP=="+clientIP);
         String localMac = addressUtil.getMac(clientIP);
-        System.out.println("localMac=="+localMac);
+        log.info("localMac=="+localMac);
         return null;
     }
 

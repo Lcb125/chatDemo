@@ -22,7 +22,7 @@
     </sql>
 
     <insert id="insertAccessInfo" parameterType="com.chat.sys.entity.AccessInfo">
-        insert into access_info(access_code,device_id,access_level,available_num,access_type, status, language,,update_time)
+        insert into access_info(access_code,device_id,access_level,available_num,access_type, status, language,update_time)
         values(#{accessCode},#{deviceId},#{accessLevel},#{availableNum},#{accessType},#{status},#{language},#{updateTime});
     </insert>
 
@@ -39,6 +39,9 @@
             </if>
             <if test="accessLevel!=null and accessLevel!=''">
                 access_level = #{accessLevel},
+            </if>
+            <if test="accessType!=null and accessType!=''">
+                access_type = #{accessType},
             </if>
             <if test="status!=null and status!=''">
                 status = #{status},

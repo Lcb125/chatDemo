@@ -60,5 +60,11 @@ public class AccessInfo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
+    /**
+     * 选择当前使用API
+     */
+    private String selectAPI;
+
+
 
 }

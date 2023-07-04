@@ -4,6 +4,7 @@ package com.chat.common;
 import com.chat.exception.MyException;
 import com.chat.sys.entity.Enum.RespEnum;
 import com.chat.sys.entity.ResponseResult;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-
+@Slf4j
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
 
@@ -29,9 +30,9 @@ public class LoginInterceptor implements HandlerInterceptor {
     //Controller逻辑执行之前
     @Override
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
-        System.out.println("preHandle....");
+        log.info("preHandle....");
         String uri = request.getRequestURI();
-        System.out.println("当前路径："+uri);
+        log.info("当前路径："+uri);
         /**
          * HandlerMethod=>Controller中标注@RequestMapping的方法
          *  需要配置静态资源不拦截时，添加这块逻辑  => 前后端分离项目
@@ -44,13 +45,14 @@ public class LoginInterceptor implements HandlerInterceptor {
         String token = request.getHeader("authToken");
         System.out.println("authToken==="+token);
         if (token == null){
-            System.out.println("未登录1");
+            log.info("未登录1");
             return false;
         }
         TokenUtils tokenUtils = new TokenUtils();
-        if (!tokenUtils.verify(token)) {
+        String verify = tokenUtils.verify(token);
+        if (verify == null) {
             // 未登录跳转到登录界面
-            System.out.println("未登录");
+            log.info("未登录");
             return false;
         } else {
             return true;

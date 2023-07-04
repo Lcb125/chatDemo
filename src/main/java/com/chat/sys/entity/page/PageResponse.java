@@ -28,4 +28,9 @@ public class PageResponse {
      */
     private List<?> listInfo;
 
+    /**
+     * 用户类型
+     */
+    private String userType;
+
 }

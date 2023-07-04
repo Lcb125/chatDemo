@@ -23,7 +23,7 @@ public class UserInfoService {
         return userInfoMapper.insertUserInfo(userInfo);
     }
 
-    public UserInfo queryUserInfo(UserInfo userInfo) {
+    public List<UserInfo> queryUserInfo(UserInfo userInfo) {
         return userInfoMapper.queryUserInfo(userInfo);
     }
 
@@ -49,7 +49,9 @@ public class UserInfoService {
         int pageNum = pageRequest.getPageNum();
         int pageSize = pageRequest.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
-        List<UserInfo> sysMenus = userInfoMapper.queryUsers();
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserStatus("Y");
+        List<UserInfo> sysMenus = userInfoMapper.queryUsers(userInfo);
         return new PageInfo<UserInfo>(sysMenus);
     }
 }

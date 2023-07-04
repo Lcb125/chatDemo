@@ -10,11 +10,11 @@ import java.util.List;
 public interface UserInfoMapper {
     boolean insertUserInfo(UserInfo userInfo);
 
-    UserInfo queryUserInfo(UserInfo userInfo);
+    List<UserInfo> queryUserInfo(UserInfo userInfo);
 
     boolean updateUserInfo(UserInfo userInfo);
 
     boolean deleteUserInfo(UserInfo userInfo);
 
-    List<UserInfo> queryUsers();
+    List<UserInfo> queryUsers(UserInfo userInfo);
 }

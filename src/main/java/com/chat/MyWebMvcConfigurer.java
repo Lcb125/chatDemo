@@ -35,7 +35,7 @@ public class MyWebMvcConfigurer implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LoginInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/user/queryUser","/chat/**","/config/querySwitch","/config/queryPrompt");
+                .excludePathPatterns("/user/queryUser","/chat/**","/config/querySwitch","/msg/queryMsg","/access/updateAccess","/file/**");
     }
 
     //配置跨域支持

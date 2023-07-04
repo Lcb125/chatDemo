@@ -16,9 +16,14 @@ public class PageRequest {
     private int pageSize;
 
     /**
-     * 每页数量
+     * 访问码
      */
     private int code;
+
+    /**
+     * 配置信息key
+     */
+    private String codeKey;
 
 
 }

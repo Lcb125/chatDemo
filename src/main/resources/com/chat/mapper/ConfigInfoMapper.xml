@@ -51,7 +51,7 @@
     </update>
 
     <delete id="deleteConfigInfo" parameterType="java.lang.Integer">
-        update config_info set status = '0' where id = #{id};
+        update config_info set status = 'N' where id = #{id};
     </delete>
 
 

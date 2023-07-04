@@ -6,6 +6,7 @@ public enum RespEnum implements ResultCode {
     
     SUCCESS(200,"操作成功"),
     FIRST(300,"首次进入"),
+    EXIST(400,"已存在"),
     FAIL(500,"操作失败");
 
 

@@ -16,7 +16,7 @@ import java.util.Map;
 @Component
 public class TokenUtils {
     //设置过期时间
-    private static final long EXPIRE_DATE=15*60*100000;
+    private static final long EXPIRE_DATE=24*60*60*1000;
     //token秘钥
     private static final String TOKEN_SECRET = "ChuanBinLiasdfghjklmn2023";
 
@@ -45,7 +45,7 @@ public class TokenUtils {
         return token;
     }
 
-    public boolean verify(String token){
+    public String verify(String token){
         /**
          * @desc   验证token，通过返回true
          * @params [token]需要校验的串
@@ -54,14 +54,14 @@ public class TokenUtils {
             Algorithm algorithm = Algorithm.HMAC256(TOKEN_SECRET);
             JWTVerifier verifier = JWT.require(algorithm).build();
             DecodedJWT jwt = verifier.verify(token);
-
-            System.out.println(jwt.getClaims().get("username").asString());
 //            System.out.println(jwt.getClaims().get("password").asString());
-
-            return true;
+            String username = jwt.getClaims().get("username").asString();
+            String password = jwt.getClaims().get("password").asString();
+            String result = username+"-"+password;
+            return result;
         }catch (Exception e){
             e.printStackTrace();
-            return  false;
+            return  null;
         }
     }
 //    public static void main(String[] args) {

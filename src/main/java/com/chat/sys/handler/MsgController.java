@@ -9,6 +9,7 @@ import com.chat.sys.entity.page.PageRequest;
 import com.chat.sys.entity.page.PageResponse;
 import com.chat.sys.service.ConfigInfoService;
 import com.chat.sys.service.MsgService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Controller
 @RequestMapping("/msg")
 public class MsgController {
@@ -34,7 +36,7 @@ public class MsgController {
 
         try {
             MsgInfo msgInfo = new MsgInfo();
-            System.out.println("MsgType====="+accessInfo);
+            log.info("MsgType====="+accessInfo);
             msgInfo.setMsgType(accessInfo.getLanguage());
             List<MsgInfo> msgInfos = msgService.queryMsgInfo(msgInfo);
             Map<String,String> resultMap = new HashMap<>();
@@ -44,7 +46,7 @@ public class MsgController {
             resultMap.put("language",accessInfo.getLanguage());
             return new ResponseResult(RespEnum.SUCCESS,resultMap);
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            log.info("queryMsg异常"+e.getMessage());
             return new ResponseResult(RespEnum.FAIL,"获取配置信息失败");
         }
     }

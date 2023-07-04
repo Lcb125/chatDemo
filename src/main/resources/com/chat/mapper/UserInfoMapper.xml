@@ -9,17 +9,18 @@
         <result property="userName" column="user_name"></result>
         <result property="password" column="password"></result>
         <result property="userType" column="user_type"></result>
+        <result property="userStatus" column="user_status"></result>
         <result property="createTime" column="create_time"></result>
         <result property="updateTime" column="update_time"></result>
     </resultMap>
 
     <sql id="Base_Column_List" >
-        id, user_name, password, user_type, create_time, update_time
+        id, user_name, password, user_type,user_status, create_time, update_time
     </sql>
 
     <insert id="insertUserInfo" parameterType="com.chat.sys.entity.UserInfo">
-        insert into user_info(user_name,password,user_type)
-        values(#{userName},#{password},#{userType});
+        insert into user_info(user_name,password,user_type,user_status)
+        values(#{userName},#{password},#{userType},#{userStatus});
     </insert>
 
 
@@ -39,17 +40,28 @@
             <if test="userType!=null">
                 user_Type = #{userType},
             </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime},
+            </if>
         </trim>
         where id = #{id};
     </update>
 
-    <delete id="deleteUserInfo" parameterType="java.lang.Integer">
-        delete from user_info where id = #{id};
-    </delete>
+    <update id="deleteUserInfo" parameterType="com.chat.sys.entity.UserInfo">
+        update user_info set user_status = 'N' where id = #{id};
+    </update>
 
-    <select id="queryUsers" resultMap="userResult">
+    <select id="queryUsers" parameterType="com.chat.sys.entity.UserInfo" resultMap="userResult">
         select
         <include refid="Base_Column_List" />
         from user_info
+        <where>
+            <if test="userStatus!=null and userStatus!=''">
+                and user_status = #{userStatus}
+            </if>
+            <if test="userName!=null  and userName!=''">
+                and user_name = #{userName}
+            </if>
+        </where>
     </select>
 </mapper>

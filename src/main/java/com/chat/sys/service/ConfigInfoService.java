@@ -43,7 +43,8 @@ public class ConfigInfoService {
         int pageSize = pageRequest.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
         ConfigInfo configInfo = new ConfigInfo();
-        configInfo.setStatus("1");
+        configInfo.setStatus("Y");
+        configInfo.setCodeKey(pageRequest.getCodeKey());
         List<ConfigInfo> sysMenus = configInfoMapper.queryConfig(configInfo);
         return new PageInfo<ConfigInfo>(sysMenus);
     }

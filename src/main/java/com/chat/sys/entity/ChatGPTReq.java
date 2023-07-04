@@ -1,10 +1,13 @@
 package com.chat.sys.entity;
 
 
+import lombok.Data;
+
 /**
  *
  */
 
+@Data
 public class ChatGPTReq {
     private String content;
 
@@ -45,6 +48,11 @@ public class ChatGPTReq {
      * 设备唯一标识
      */
     private String uniqueIdentification;
+
+    /**
+     * 选择当前使用服务API
+     */
+    private String selectAPI;
 
 
     public String getContent() {

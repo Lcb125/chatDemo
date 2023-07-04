@@ -29,6 +29,11 @@ public class UserInfo {
     private String userType;
 
     /**
+     * 用户类型
+     */
+    private String userStatus;
+
+    /**
      * 创建时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

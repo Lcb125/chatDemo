@@ -7,11 +7,13 @@ import com.chat.sys.entity.page.PageResponse;
 import com.chat.sys.mapper.AccessInfoMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class AccessInfoService {
 
@@ -58,7 +60,7 @@ public class AccessInfoService {
         if (pageRequest.getCode() != 0){
             accessInfo.setAccessCode(pageRequest.getCode());
         }
-        System.out.println("accessInfo=============="+accessInfo);
+        log.info("accessInfo=============="+accessInfo);
         List<AccessInfo> sysMenus = accessInfoMapper.queryAccess(accessInfo);
         return new PageInfo<AccessInfo>(sysMenus);
     }
@@ -66,4 +68,5 @@ public class AccessInfoService {
     public boolean deleteAccessInfo(AccessInfo accessInfo) {
         return accessInfoMapper.deleteAccessInfo(accessInfo);
     }
+
 }
